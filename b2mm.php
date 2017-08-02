@@ -1,17 +1,16 @@
 <?php
 $mattermostUrl = "https://REPLACE_TO_YOUR_WEBHOOKURL";
-$backlogUrl = "https://example.backlog.jp/view/";
+$backlogUrl    = "https://example.backlog.jp/view/";
 
 // 受信処理
 $json_string = file_get_contents('php://input');
-
 $backlog = json_decode($json_string);
 
 // 送信処理
 $mattermost = array();
-$issue_id = $backlog->project->projectKey . '-' . $backlog->content->key_id;
-$tag_id = $backlog->project->projectKey . '_' . $backlog->content->key_id;
-$title = $backlog->content->summary;
+$issue_id   = $backlog->project->projectKey . '-' . $backlog->content->key_id;
+$tag_id     = $backlog->project->projectKey . '_' . $backlog->content->key_id;
+$title      = $backlog->content->summary;
 $comment_id = $backlog->content->comment->id;
 
 //メッセージ
@@ -20,9 +19,9 @@ switch ($backlog->type) {
     case 1:
         $mattermost['text'] = "新しい課題を追加しました。 #{$tag_id}";
         $mattermost['attachments'][] = array(
-            'title' => $title,
+            'title'      => $title,
             'title_link' => "{$backlogUrl}{$issue_id}",
-            'text' => $backlog->content->description
+            'text'       => $backlog->content->description
         );
         break;
 
@@ -30,9 +29,9 @@ switch ($backlog->type) {
     case 3:
         $mattermost['text'] = "新しいコメントを登録しました。 #{$tag_id}";
         $mattermost['attachments'][] = array(
-            'title' => $title,
+            'title'      => $title,
             'title_link' => "{$backlogUrl}{$issue_id}#comment-{$comment_id}",
-            'text' => $backlog->content->comment->content
+            'text'       => $backlog->content->comment->content
         );
         break;
 
@@ -50,12 +49,12 @@ $options = array(
   'http' => array(
     'method'  => 'POST',
     'content' => json_encode($mattermost),
-    'header'=>  "Content-Type: application/json\r\n" .
-                "Accept: application/json\r\n"
+    'header'  =>  "Content-Type: application/json\r\n" .
+                  "Accept: application/json\r\n"
     )
 );
  
 $context  = stream_context_create($options);
-$result = json_decode(file_get_contents($mattermostUrl, false, $context));
+$result   = json_decode(file_get_contents($mattermostUrl, false, $context));
  
 var_dump($result);
