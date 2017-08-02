@@ -44,6 +44,7 @@ switch ($backlog->type) {
 
 //Mattermostに投稿するBOTユーザ名
 $mattermost['username'] = "{$backlog->createdUser->name}@Backlog";
+$mattermost['icon_url'] = "https://assets.backlog.jp/R20170801/images/_newUI/icon/project_icons/01@2x.png";
 
 $options = array(
   'http' => array(
