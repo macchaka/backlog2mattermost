@@ -1,6 +1,5 @@
 <?php
-$mattermostUrl = "https://REPLACE_TO_YOUR_WEBHOOKURL";
-$backlogUrl    = "https://example.backlog.jp/view/";
+require_once('config.php');
 
 // 受信処理
 $json_string = file_get_contents('php://input');
@@ -25,7 +24,27 @@ switch ($backlog->type) {
         );
         break;
 
-    //コメント
+    //課題の更新
+    case 2:
+        $mattermost['text'] = "課題が更新されました。 #{$tag_id}";
+        $mattermost['attachments'][] = array(
+            'title'      => $title,
+            'title_link' => "{$backlogUrl}{$issue_id}#comment-{$comment_id}",
+            'text'       => $backlog->content->comment->content
+        );
+        //changesの展開
+        $changes = "| 項目名 | 変更前 | 変更後 |\n";
+        $changes .= "|---|---|---|\n";
+        foreach ($backlog->content->changes as $row) {
+            $changes .= '|' . $row->field . '|' . $row->old_value . '|' . $row->new_value . "|\n";
+        }
+        $mattermost['attachments'][] = array(
+            'title'      => '変更点',
+            'text'       => $changes
+        );
+        break;
+
+    //課題にコメント
     case 3:
         $mattermost['text'] = "新しいコメントを登録しました。 #{$tag_id}";
         $mattermost['attachments'][] = array(
@@ -33,6 +52,11 @@ switch ($backlog->type) {
             'title_link' => "{$backlogUrl}{$issue_id}#comment-{$comment_id}",
             'text'       => $backlog->content->comment->content
         );
+        break;
+
+    //課題の削除
+    case 4:
+        die('undefined');
         break;
 
     //未定義

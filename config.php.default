@@ -1,0 +1,3 @@
+<?php
+$mattermostUrl = "https://REPLACE_TO_YOUR_WEBHOOKURL";
+$backlogUrl    = "https://example.backlog.jp/view/";
